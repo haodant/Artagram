@@ -7,4 +7,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'ignite';
+  posts=[];
+  onPostAdded(post) {
+    // this.posts = [...this.posts, post];
+    this.posts.push(post);
+  }
 }
