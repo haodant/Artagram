@@ -16,6 +16,7 @@ mongoose.connect("mongodb+srv://Ashley:NZemLa68D7icQh7R@cluster0-secyx.mongodb.n
 
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
