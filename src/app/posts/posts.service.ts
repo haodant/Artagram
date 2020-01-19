@@ -4,33 +4,40 @@ import { Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { Router } from "@angular/router";
+import { post } from "selenium-webdriver/http";
 
 @Injectable({ providedIn: "root" })
 export class PostsService {
   private posts: Post[] = [];
-  private postsUpdated = new Subject<Post[]>();
+  private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
   private postUrl = "http://localhost:3000/api/posts/";
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  getPosts() {
+  getPosts(postsPerPage: number, currentPage: number) {
+    const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
     this.http
-      .get<{ message: string; posts: any }>(this.postUrl)
+      .get<{ message: string; posts: any; maxPosts: number }>(
+        "http://localhost:3000/api/posts" + queryParams
+      )
       .pipe(
         map(postData => {
-          return postData.posts.map(post => {
-            return {
-              title: post.title,
-              content: post.content,
-              id: post._id,
-              imagePath: post.imagePath
-            };
-          });
+          return {
+            posts: postData.posts.map(post => {
+              return {
+                title: post.title,
+                content: post.content,
+                id: post._id,
+                imagePath: post.imagePath
+              };
+            }),
+            maxPosts: postData.maxPosts
+          };
         })
       )
-      .subscribe(posts => {
-        this.posts = posts;
-        this.postsUpdated.next([...this.posts]);
+      .subscribe(postsData => {
+        this.posts = postsData.posts;
+        this.postsUpdated.next({ posts: [...this.posts], postCount: postsData.maxPosts });
       });
   }
 
@@ -39,40 +46,31 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.http.get<{ _id: string, title: string, content: string, imagePath: string }>(
-      this.postUrl + id
-    );
+    return this.http.get<{
+      _id: string;
+      title: string;
+      content: string;
+      imagePath: string;
+    }>(this.postUrl + id);
   }
 
   updatePost(id: string, title: string, content: string, image: File | string) {
-      let postData: Post | FormData;
-      if (typeof image === 'object') {
-        postData = new FormData();
-        postData.append('id', id);
-        postData.append("title", title);
-        postData.append("content", content);
-        postData.append("image", image, title);
-      } else {
-        postData = {
-            id: id,
-            title: title,
-            content: content,
-            imagePath: image
-          };
-      }
-    this.http.put(this.postUrl + id, postData)
-      .subscribe(response => {
-      const updatePosts = [...this.posts];
-      const oldPostIndex = updatePosts.findIndex(p => p.id === id);
-      const post: Post = {
+    let postData: Post | FormData;
+    if (typeof image === "object") {
+      postData = new FormData();
+      postData.append("id", id);
+      postData.append("title", title);
+      postData.append("content", content);
+      postData.append("image", image, title);
+    } else {
+      postData = {
         id: id,
         title: title,
         content: content,
-        imagePath: ""//response.imagePath
+        imagePath: image
       };
-      updatePosts[oldPostIndex] = post;
-      this.posts = updatePosts;
-      this.postsUpdated.next([...this.posts]);
+    }
+    this.http.put(this.postUrl + id, postData).subscribe(response => {
       this.router.navigate(["/"]);
     });
   }
@@ -86,23 +84,11 @@ export class PostsService {
     this.http
       .post<{ message: string; post: Post }>(this.postUrl, postData)
       .subscribe(responseData => {
-        const post: Post = {
-          id: responseData.post.id,
-          title: title,
-          content: content,
-          imagePath: responseData.post.imagePath
-        };
-        this.posts.push(post);
-        this.postsUpdated.next([...this.posts]);
         this.router.navigate(["/"]);
       });
   }
 
   deletePost(postId: string) {
-    this.http.delete(this.postUrl + postId).subscribe(() => {
-      const updatedPosts = this.posts.filter(post => post.id != postId);
-      this.posts = updatedPosts;
-      this.postsUpdated.next([...this.posts]);
-    });
+    return this.http.delete(this.postUrl + postId);
   }
 }
