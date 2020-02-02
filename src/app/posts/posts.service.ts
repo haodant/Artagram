@@ -4,12 +4,14 @@ import { Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { map } from "rxjs/operators";
 import { Router } from "@angular/router";
+import { environment } from 'src/environments/environment';
+
 
 @Injectable({ providedIn: "root" })
 export class PostsService {
   private posts: Post[] = [];
   private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
-  private postUrl = "http://localhost:3000/api/posts/";
+  private postUrl = environment.apiUrl + "/posts";
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -17,7 +19,7 @@ export class PostsService {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
     this.http
       .get<{ message: string; posts: any; maxPosts: number }>(
-        "http://localhost:3000/api/posts" + queryParams
+        this.postUrl + queryParams
       )
       .pipe(
         map(postData => {
@@ -27,7 +29,8 @@ export class PostsService {
                 title: post.title,
                 content: post.content,
                 id: post._id,
-                imagePath: post.imagePath
+                imagePath: post.imagePath,
+                creator: post.creator
               };
             }),
             maxPosts: postData.maxPosts
@@ -50,7 +53,8 @@ export class PostsService {
       title: string;
       content: string;
       imagePath: string;
-    }>(this.postUrl + id);
+      creator: string;
+    }>(this.postUrl + "/" + id);
   }
 
   updatePost(id: string, title: string, content: string, image: File | string) {
@@ -66,10 +70,11 @@ export class PostsService {
         id: id,
         title: title,
         content: content,
-        imagePath: image
+        imagePath: image,
+        creator: null
       };
     }
-    this.http.put(this.postUrl + id, postData).subscribe(response => {
+    this.http.put(this.postUrl + "/" + id, postData).subscribe(response => {
       this.router.navigate(["/"]);
     });
   }
