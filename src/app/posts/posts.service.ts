@@ -93,6 +93,6 @@ export class PostsService {
   }
 
   deletePost(postId: string) {
-    return this.http.delete(this.postUrl + postId);
+    return this.http.delete(this.postUrl + "/" + postId);
   }
 }
