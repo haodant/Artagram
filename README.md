@@ -1,5 +1,19 @@
 # Artagram
 
+This project was created with MEAN (Mongodb, Express, Angular, and Node) stack.
+
+Artagram is a web application for displaying art pieces that are gathered by collective efforts. It allows multiple users to sign up, create post, and browse other people's posts.
+
+Online website: http://www.art-agram.com
+
+## Features
+- Allows multiple users to sign up
+- Everyone can see all the posts
+- After signed in, users can also see recent updates on the website, e.g. someone create a new project, someone signed up
+- After signed in, users can create post, or edit, delete their own posts but not others'
+
+### How to run the project locally
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.3.22.
 
 ## Development server
@@ -13,14 +27,6 @@ Run `ng generate component component-name` to generate a new component. You can 
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 
 ## Further help
 
