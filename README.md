@@ -33,12 +33,13 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
 ## Screenshots
+###Main Page
 ![main page](public/artagram_main.png)
-Main Page
 Only the posts created by logined users will have 'edit' and 'delete' buttons
-
+<br>
+###Login page
 ![login](public/artagram_login.png)
-Login page
 
+###Create or edit page
 ![create post](public/artagram_create.png)
-Create or edit page
+
